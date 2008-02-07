@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+@files = Dir["lib/**/*"]+Dir["bin/**/*"]
+
+if @files.empty?
+  puts "Ops, no files to make a gem out of."
+  exit
+else
+  puts "These files will be included in the gem:"
+  puts @files.map{|x|" "+x}
+end
+
+trap("INT"){puts;exit}
+
+@config = Hash.new do |h,n|
+  m,e=n.to_s.gsub('_',' ').split("+",2)
+  print m.capitalize+"? "
+  print "(#{e}) " if e
+  h[n]=gets.strip
+end
+
+Gem::Builder.new(Gem::Specification.new do |s|
+  s.name = @config[:name_of_the_gem]
+  s.summary = @config[:summary]
+  s.version = @config[:version]
+  s.author = @config[:author]
+  s.email = @config[:email]
+  s.platform = Gem::Platform::RUBY
+  s.files = @files
+  
+  if File.directory? "bin"
+    s.bindir = "bin"
+    s.executables << Dir["bin/**/*"].map{|x|x[4..-1]}
+  end
+  s.require_path = "lib" if File.directory? "lib"
+  
+  @config[:"dependencies+split_by_space"].split(" ").each do |d|
+    s.add_dependency d
+  end
+end).build

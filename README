@@ -1,0 +1,5 @@
+== Gemify ==
+
+Gemify is an extremely simple way to create a RubyGem. Simply run the executable,
+gemify, in a directory where you have the sub-directories lib and/or bin. All
+files in lib will be requirable and all files in bin will be executable.
