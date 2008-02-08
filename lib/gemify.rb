@@ -3,7 +3,7 @@ require 'yaml'
 
 class Gemify
   REQUIRED = [:name, :summary, :version]
-  OPTIONAL = [:author, :email, :homepage, :rubyforge_project]
+  OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :dependencies]
   ALL = REQUIRED+OPTIONAL
   REPLACE = {:rubyforge_project => "RubyForge project"}
   def initialize
@@ -26,9 +26,9 @@ class Gemify
     loop do
       menu
       puts @result if @result
-      result = nil
-      l=(i=gets).downcase[0]
-      i=i.to_i
+      @result = nil
+      l=(o=gets).downcase[0]
+      i=o.to_i
       
       if l==?x
         puts "Exiting..."
@@ -39,21 +39,28 @@ class Gemify
         build
       end
       
-      if (1..ALL.length).include? i
+      if (1..ALL.length-1).include? i
         sub_task(i)
         next
       end
       
-      if i==ALL.length+1
+      case i-(ALL.length-1)
+      when 1
+        puts "Write all your dependencies here, split by ENTER and"
+        puts "press ENTER twice when you're done:"
+        @settings[:dependencies] = $stdin.gets($/*2).strip.split($/)
+        @settings.delete(:dependencies) if @settings[:dependencies].empty?
+        @result = "Updated 'dependencies'"
+        next
+      when 2
         save
         next
-      end
-      
-      if i==ALL.length+2
+      when 3
         @result = @all.join($/)
         next
       end
-      @result = "Can't find task..."
+      
+      @result = "Can't find the task named '#{o}'"
     end
   end
   
@@ -73,11 +80,11 @@ class Gemify
     puts
   end
   
+  ## Special tasks
+  
   def build
     Gem::Builder.new(Gem::Specification.new do |s|
-      @settings.each do |key, value|
-        s.send("#{key}=",value)
-      end
+      @settings.each { |key, value| s.send("#{key}=",value) }
       s.platform = Gem::Platform::RUBY
       s.files = @all
       s.bindir = "bin"
@@ -95,28 +102,29 @@ class Gemify
       f << YAML.dump(@settings)
     end
     @result = "Saved!"
-  end
-  
-  # Tasks
-  def build_task(m)
-    index = (ALL.index(m)||0)+1
-    verb,now = if @settings.keys.include?(m)
-      ["Change"," = " + @settings[m]]
-    else
-      ["Set"," "]
-    end
-    req = REQUIRED.include?(m) ? " (required)" : ""
-    "#{index}) #{verb} #{show(m)}#{req}#{now}"
-  end
+  end  
   
   def sub_task(i)
     key = ALL[i-1]
     menu
     @settings[key] = gets(key)
+    @settings.delete(key) if @settings[key].empty?
     @result = "Updated '#{show(key)}'"
   end
   
   # Helpers
+  private
+  def build_task(m)
+    index = (ALL.index(m)||0)+1
+    verb,now = if @settings.keys.include?(m)
+      ["Change"," = " + inspect_setting(m)]
+    else
+      ["Set",""]
+    end
+    req = REQUIRED.include?(m) ? " (required)" : ""
+    "#{index}) #{verb} #{show(m)}#{req}#{now}"
+  end
+  
   def clear
     print "\e[H\e[2J"
   end
@@ -128,5 +136,14 @@ class Gemify
   
   def show(m)
     REPLACE[m]||m.to_s
+  end
+  
+  def inspect_setting(m)
+    case i=@settings[m]
+    when Array
+      i.join(", ")
+    else
+      i.to_s
+    end
   end
 end
