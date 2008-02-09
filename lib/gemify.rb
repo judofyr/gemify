@@ -2,6 +2,7 @@ require 'rubygems'
 require 'yaml'
 
 class Gemify
+  class Exit < StandardError;end
   REQUIRED = [:name, :summary, :version]
   OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :dependencies]
   ALL = REQUIRED+OPTIONAL
@@ -14,7 +15,7 @@ class Gemify
     
     if @all.empty?
       puts "Can't find anything to make a gem out of..."
-      exit
+      raise Exit
     end
     
     if File.exists? ".gemified"
@@ -32,7 +33,7 @@ class Gemify
       
       if l==?x
         puts "Exiting..."
-        exit
+        raise Exit
       end   
       
       if l==?b
@@ -56,7 +57,7 @@ class Gemify
         save
         next
       when 3
-        @result = @all.join($/)
+        @result = "Included files:#{$/}" + @all.join($/)
         next
       end
       
@@ -94,13 +95,11 @@ class Gemify
         s.executables << @bin.map{|x|x[4..-1]}
       end
     end).build
-    exit
+    raise Exit
   end
   
   def save
-    File.open(".gemified","w") do |f|
-      f << YAML.dump(@settings)
-    end
+    File.open(".gemified","w"){|f|f<<YAML.dump(@settings)}
     @result = "Saved!"
   end  
   

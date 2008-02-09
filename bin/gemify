@@ -1,3 +1,7 @@
 #!/usr/bin/env ruby
 require 'gemify'
-Gemify.new.main
+begin
+  Gemify.new.main
+rescue Gemify::Exit
+  exit
+end
