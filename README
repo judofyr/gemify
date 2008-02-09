@@ -1,5 +1,25 @@
-== Gemify ==
+= Gemify =
+== What ==
+I like you. Thanks to NewGem[http://drnicwilliams.com/2006/10/11/generating-new-gems/]
+you have finally learned to share code. By simply running a command you'll get a
+filled up directory with lots of goodies. But sometimes you don't need all this
+awesome stuff. Sometimes you don't want your project to be filled up with unneeded
+stuff, when all you want to do is building a gem. And that's when you should use Gemify!
 
-Gemify is an extremely simple way to create a RubyGem. Simply run the executable,
-gemify, in a directory where you have the sub-directories lib and/or bin. All
-files in lib will be requirable and all files in bin will be executable.
+== How ==
+Gemify gives you one single executable you should run: gemify. It does one thing
+and, hopefully, it does it well. All you need to do is to run that command in your
+project-folder. All your files in the lib-folder will be requirable and all your
+files in the bin-folder will be executable.
+
+When you run gemify it will asks you some questions, and give you the option to
+save your settings (in the file .gemified). So you should never need to re-enter
+anything.
+
+== Install ==
+sudo gem install gemify
+
+== Contribute ==
+The source is availble at Gitorious[http://gitorious.org/projects/gemify] and
+if you want to improve it, simply fork it and implement your awesome ideas there.
+You can also send your patches by email to judofyr@gmail.com.
