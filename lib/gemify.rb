@@ -94,6 +94,10 @@ class Gemify
       unless @bin.empty?
         s.executables << @bin.map{|x|x[4..-1]}
       end
+      
+      @settings[:dependencies].each do |dep|
+        s.add_dependency dep
+      end
     end).build
     raise Exit
   end
