@@ -49,8 +49,8 @@ class Gemify
       when 1
         puts "Write all your dependencies here, split by ENTER and"
         puts "press ENTER twice when you're done:"
-        @settings[:dependencies] = $stdin.gets($/*2).strip.split($/)
-        @settings.delete(:dependencies) if @settings[:dependencies].empty?
+        @dependencies = $stdin.gets($/*2).strip.split($/)
+        @dependencies = nil if @dependencies.empty?
         @result = "Updated 'dependencies'"
         next
       when 2
@@ -95,7 +95,7 @@ class Gemify
         s.executables << @bin.map{|x|x[4..-1]}
       end
       
-      @settings[:dependencies].each do |dep|
+      (@dependencies||[]).each do |dep|     
         s.add_dependency dep
       end
     end).build
