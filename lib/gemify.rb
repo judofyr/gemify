@@ -21,6 +21,8 @@ class Gemify
     if File.exists? ".gemified"
       @settings = YAML.load(open(".gemified"))
     end
+  rescue Errno::EACCES
+    @result = "Can't read .gemified"
   end
   
   def main
@@ -105,6 +107,8 @@ class Gemify
   def save
     File.open(".gemified","w"){|f|f<<YAML.dump(@settings)}
     @result = "Saved!"
+  rescue Errno::EACCES
+    @result = "Can't write to .gemified"
   end  
   
   def sub_task(i)
