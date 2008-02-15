@@ -9,9 +9,7 @@ class Gemify
   REPLACE = {:rubyforge_project => "RubyForge project"}
   def initialize
     @settings = {}
-    @bin = Dir["bin/**/*"]
-    @lib = Dir["lib/**/*"]
-    @all = @bin + @lib
+    @all = (@bin = Dir["bin/**/*"]) + Dir["lib/**/*"]
     
     if @all.empty?
       puts "Can't find anything to make a gem out of..."
@@ -91,7 +89,7 @@ class Gemify
       s.platform = Gem::Platform::RUBY
       s.files = @all
       s.bindir = "bin"
-      s.require_paths = "lib"
+      s.require_path = "lib"
 
       unless @bin.empty?
         s.executables = @bin.map{|x|x[4..-1]}
