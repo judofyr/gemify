@@ -91,10 +91,10 @@ class Gemify
       s.platform = Gem::Platform::RUBY
       s.files = @all
       s.bindir = "bin"
-      s.require_path "lib"
+      s.require_paths = "lib"
 
       unless @bin.empty?
-        s.executables << @bin.map{|x|x[4..-1]}
+        s.executables = @bin.map{|x|x[4..-1]}
       end
       
       (@dependencies||[]).each do |dep|     
