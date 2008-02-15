@@ -1,8 +1,8 @@
 --- 
 :rubyforge_project: dojo
 :author: Magnus Holm
-:version: "0.2"
 :name: gemify
+:version: 0.2.1
 :summary: An extremely simple way to create a RubyGem
 :email: judofyr@gmail.com
 :homepage: http://dojo.rubyforge.org
