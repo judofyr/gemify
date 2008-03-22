@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'rubygems/builder'
 require 'yaml'
 
 class Gemify
