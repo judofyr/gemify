@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
-require 'gemify'
+begin
+  require 'gemify'
+rescue LoadError
+  require 'lib/gemify'
+end
+
 begin
   Gemify.new.main
 rescue Gemify::Exit
