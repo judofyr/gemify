@@ -50,8 +50,8 @@ class Gemify
       when 1
         puts "Write all your dependencies here, split by ENTER and"
         puts "press ENTER twice when you're done:"
-        @dependencies = $stdin.gets($/*2).strip.split($/)
-        @dependencies = nil if @dependencies.empty?
+        @settings[:dependencies] = $stdin.gets($/*2).strip.split($/)
+        @settings.delete(:dependencies) if @settings[:dependencies].empty?
         @result = "Updated 'dependencies'"
         next
       when 2
@@ -86,6 +86,10 @@ class Gemify
   
   def build
     Gem::Builder.new(Gem::Specification.new do |s|
+      (@settings.delete(:dependencies)||[]).each do |dep|
+        s.add_dependency dep
+      end
+      
       @settings.each { |key, value| s.send("#{key}=",value) }
       s.platform = Gem::Platform::RUBY
       s.files = @all
@@ -94,10 +98,6 @@ class Gemify
 
       unless @bin.empty?
         s.executables = @bin.map{|x|x[4..-1]}
-      end
-      
-      (@dependencies||[]).each do |dep|     
-        s.add_dependency dep
       end
     end).build
     raise Exit
