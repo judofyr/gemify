@@ -1,0 +1,11 @@
+namespace :gemify do
+  task :load do
+    require 'rubygems'
+    require 'gemify'
+  end
+  
+  desc "Builds a gem"
+  task :build => :load do
+    Gemify.new.build rescue Gemify::Exit
+  end
+end
