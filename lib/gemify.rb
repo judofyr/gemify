@@ -4,15 +4,16 @@ require 'yaml'
 
 class Gemify
   class Exit < StandardError;end
+  MANIFEST = ["MANIFEST", "Manifest.txt", ".manifest"]
   REQUIRED = [:name, :summary, :version]
   OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :dependencies]
   ALL = REQUIRED+OPTIONAL
   REPLACE = {:rubyforge_project => "RubyForge project"}
   def initialize
     @settings = {}
-    @all = (@bin = Dir["bin/**/*"]) + Dir["lib/**/*"]
+    @bin = Dir["bin/**/*"]
     
-    if @all.empty?
+    if files.empty?
       puts "Can't find anything to make a gem out of..."
       raise Exit
     end
@@ -22,6 +23,14 @@ class Gemify
     end
   rescue Errno::EACCES
     @result = "Can't read .gemified"
+  end
+  
+  def files
+    @files ||= if m=MANIFEST.detect{|x|File.exist?(x)}
+      File.read(m).split(/\r?\n/)
+    else
+      @bin + Dir["lib/**/*"]
+    end
   end
   
   def main
@@ -58,7 +67,7 @@ class Gemify
         save
         next
       when 3
-        @result = "Included files:#{$/}" + @all.join($/)
+        @result = "Included files:#{$/}" + files.join($/)
         next
       end
       
@@ -92,7 +101,7 @@ class Gemify
       
       @settings.each { |key, value| s.send("#{key}=",value) }
       s.platform = Gem::Platform::RUBY
-      s.files = @all
+      s.files = files
       s.bindir = "bin"
       s.require_path = "lib"
 
