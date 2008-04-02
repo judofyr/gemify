@@ -6,7 +6,7 @@ class Gemify
   class Exit < StandardError;end
   MANIFEST = ["MANIFEST", "Manifest.txt", ".manifest"]
   REQUIRED = [:name, :summary, :version]
-  OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :dependencies]
+  OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :has_rdoc, :dependencies]
   ALL = REQUIRED+OPTIONAL
   REPLACE = {:rubyforge_project => "RubyForge project"}
   def initialize
