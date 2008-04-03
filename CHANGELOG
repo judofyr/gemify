@@ -1,0 +1,22 @@
+== 0.2.3 - 2008-03-23
+* Require rubygems/builder (defunkt)
+* Made it simpler to test in developement
+* Dependencies should work properly
+* Custom manifest
+
+== 0.2.2 - 2008-02-15
+* Quick-release to fix an error in 0.2.1
+
+== 0.2.1 - 2008-02-15
+* Added error-handing of .gemfied
+* Fixed some dependecies-bugs
+
+== 0.2.0 - 2008-02-09
+* Added support for dependencies
+* Raises Exit in stead of exiting
+* Read/write changes in .gemified
+* Skinny bin, fat lib
+* Added a very fancy CLI
+
+== 0.1.0 - 2008-02-07
+* The first release. More like a POC-code

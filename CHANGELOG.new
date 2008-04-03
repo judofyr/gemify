@@ -1,0 +1,4 @@
+== Should be merged with CHANGELOG before release
+* Added Sake-task
+* Added has_rdoc to the options (Ben Wyrosdick)
+* Windows-support?
