@@ -4,8 +4,15 @@ $:.unshift File.dirname(__FILE__)+"/../lib"
 
 require 'gemify'
 
+interactive = !ARGV.detect { |e| e =~ (/^(--no-interactive|-I)$/) }
+
 begin
-  Gemify.new.main
+  gemify = Gemify.new
+  if not interactive and File.exist?(".gemified")
+    gemify.build
+  else
+    gemify.main
+  end
 rescue Gemify::Exit
   exit
 end
