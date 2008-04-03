@@ -9,6 +9,7 @@ class Gemify
   OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :has_rdoc, :dependencies]
   ALL = REQUIRED+OPTIONAL
   REPLACE = {:rubyforge_project => "RubyForge project"}
+  SPECIAL = {:has_rdoc => :boolean}
   def initialize
     @settings = {}
     @bin = Dir["bin/**/*"]
@@ -141,7 +142,7 @@ class Gemify
   end
   
   def clear
-    print "\e[H\e[2J"
+    system("cls") || print("\e[H\e[2J")
   end
   
   def gets(m=nil)
