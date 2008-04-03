@@ -1,9 +1,8 @@
 #!/usr/bin/env ruby
-begin
-  require 'gemify'
-rescue LoadError
-  require 'lib/gemify'
-end
+
+$:.unshift File.dirname(__FILE__)+"/../lib"
+
+require 'gemify'
 
 begin
   Gemify.new.main

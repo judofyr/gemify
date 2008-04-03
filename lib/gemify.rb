@@ -110,7 +110,7 @@ class Gemify
   end
   
   def save
-    File.open(".gemified","w"){|f|f<<YAML.dump(@settings)}
+    File.open(".gemified","w"){|f|f << YAML.dump(@settings)}
     @result = "Saved!"
   rescue Errno::EACCES
     @result = "Can't write to .gemified"
