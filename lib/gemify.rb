@@ -8,8 +8,15 @@ class Gemify
   REQUIRED = [:name, :summary, :version]
   OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :has_rdoc, :dependencies]
   ALL = REQUIRED+OPTIONAL
-  REPLACE = {:rubyforge_project => "RubyForge project"}
-  SPECIAL = {:has_rdoc => :boolean}
+  REPLACE = {
+    :rubyforge_project => "RubyForge project",
+    :has_rdoc => "documentation",
+  }
+  TYPE = {
+    :has_rdoc => :boolean,
+    :dependencies => :array,
+  }
+  
   def initialize
     @settings = {}
     @bin = Dir["bin/**/*"]
@@ -42,33 +49,21 @@ class Gemify
       l=(o=gets).downcase[0]
       i=o.to_i
       
-      if l==?x
-        puts "Exiting..."
+      case l
+      when ?x
         raise Exit
-      end   
-      
-      if l==?b
+      when ?b
         build
-      end
-      
-      if (1..ALL.length-1).include? i
-        sub_task(i)
-        next
-      end
-      
-      case i-(ALL.length-1)
-      when 1
-        puts "Write all your dependencies here, split by ENTER and"
-        puts "press ENTER twice when you're done:"
-        @settings[:dependencies] = $stdin.gets($/*2).strip.split($/)
-        @settings.delete(:dependencies) if @settings[:dependencies].empty?
-        @result = "Updated 'dependencies'"
-        next
-      when 2
+      when ?s
         save
         next
-      when 3
+      when ?i
         @result = "Included files:#{$/}" + files.join($/)
+        next
+      end      
+      
+      if (1..ALL.length).include? i
+        set(ALL[i-1])
         next
       end
       
@@ -84,8 +79,9 @@ class Gemify
     ALL.each do |m|
       puts build_task(m)
     end
-    puts "#{ALL.length+1}) Save"
-    puts "#{ALL.length+2}) Show included files"
+    puts
+    puts "s) Save"
+    puts "i) Show included files"
     puts
     puts "b) Build gem"
     puts "x) Exit"
@@ -120,22 +116,16 @@ class Gemify
     @result = "Can't write to .gemified"
   end  
   
-  def sub_task(i)
-    key = ALL[i-1]
-    menu
-    @settings[key] = gets(key)
-    @settings.delete(key) if @settings[key].empty?
-    @result = "Updated '#{show(key)}'"
-  end
-  
-  # Helpers
-  private
   def build_task(m)
     index = (ALL.index(m)||0)+1
-    verb,now = if @settings.keys.include?(m)
-      ["Change"," = " + inspect_setting(m)]
+    unless type(m) == :boolean
+      verb,now = if @settings.keys.include?(m)
+        ["Change"," = " + inspect_setting(m)]
+      else
+        ["Set",""]
+      end
     else
-      ["Set",""]
+      verb, now = ["Toogle"," = " + inspect_setting(m)]
     end
     req = REQUIRED.include?(m) ? " (required)" : ""
     "#{index}) #{verb} #{show(m)}#{req}#{now}"
@@ -145,8 +135,26 @@ class Gemify
     system("cls") || print("\e[H\e[2J")
   end
   
-  def gets(m=nil)
-    print m ? "> #{show(m).capitalize}: " : "> "
+  def set(m)
+    menu
+    case type(m)
+    when :array
+      puts "Write all your dependencies here, split by ENTER and"
+      puts "press ENTER twice when you're done:"
+      @settings[m] = $stdin.gets($/*2).strip.split($/)
+      @settings.delete(m) if @settings[m].empty?
+    when :boolean
+      @settings[m] = !@settings[m]
+    when :string
+      print "> #{show(m).capitalize}: "
+      @settings[m] = $stdin.gets.strip
+      @settings.delete(m) if @settings[m].empty?
+    end
+    @result = "Updated '#{m}'"
+  end
+  
+  def gets
+    print("> ")
     $stdin.gets.strip
   end
   
@@ -154,11 +162,18 @@ class Gemify
     REPLACE[m]||m.to_s
   end
   
+  def type(m)
+    TYPE[m]||:string
+  end
+  
   def inspect_setting(m)
-    case i=@settings[m]
-    when Array
+    i=@settings[m]     
+    case type(m)
+    when :array
       i.join(", ")
-    else
+    when :boolean
+      (i||false).to_s
+    when :string
       i.to_s
     end
   end
