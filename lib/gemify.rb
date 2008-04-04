@@ -2,6 +2,8 @@ require 'rubygems'
 require 'rubygems/builder'
 require 'yaml'
 
+require 'gemify_vcs'
+
 class Gemify
   class Exit < StandardError;end
   MANIFEST = ["MANIFEST", "Manifest.txt", ".manifest"]
@@ -36,7 +38,7 @@ class Gemify
     @files ||= if m=MANIFEST.detect{|x|File.exist?(x)}
       File.read(m).split(/\r?\n/)
     else
-      Dir["bin/*"] + Dir["lib/**/*"]
+      VCS.files
     end
   end
   
