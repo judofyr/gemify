@@ -50,7 +50,7 @@ class VCS
     when :cvs
       get_files_from_command("cvs ls")
     when :unknown
-      Dir['bin/*', 'lib/**/**']    
+      Dir['bin/*'] + Dir['lib/**/**']    
     end
   end
 end
