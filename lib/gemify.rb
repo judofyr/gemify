@@ -45,6 +45,10 @@ class Gemify
     files.select { |file| file =~ /^bin\// }
   end
   
+  def extensions
+    files.select { |file| file =~ /extconf\.rb$/ }
+  end
+  
   def main
     loop do
       menu
@@ -111,6 +115,12 @@ class Gemify
       unless bin.empty?
         s.executables = bin.map{|x|x[4..-1]}
       end
+      
+      exts = extensions
+      unless exts.empty?
+        s.extensions = exts
+      end
+      
     end).build
     raise Exit
   end
