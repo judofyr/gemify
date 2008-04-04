@@ -96,7 +96,7 @@ class Gemify
         s.add_dependency dep
       end
       
-      @settings.each { |key, value| s.send("#{key}=",value) }
+      @settings.each { |key, value| s.send("#{key}=",value.to_s) }
       s.platform = Gem::Platform::RUBY
       s.files = files
       s.bindir = "bin"
