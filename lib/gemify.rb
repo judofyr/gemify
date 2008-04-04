@@ -139,8 +139,8 @@ class Gemify
     menu
     case type(m)
     when :array
-      puts "Write all your dependencies here, split by ENTER and"
-      puts "press ENTER twice when you're done:"
+      puts "Split by ENTER and press ENTER twice when you're done"
+      puts "> #{show(m).capitalize}: "
       @settings[m] = $stdin.gets($/*2).strip.split($/)
       @settings.delete(m) if @settings[m].empty?
     when :boolean
