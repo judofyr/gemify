@@ -2,7 +2,7 @@ require 'rubygems'
 require 'rubygems/builder'
 require 'yaml'
 
-require 'gemify_vcs'
+require 'gemify/vcs'
 
 class Gemify
   attr_accessor :from_vcs
@@ -27,17 +27,17 @@ class Gemify
     @from_vcs = false
 
     if File.exists? ".gemified"
-      @settings = YAML.load(open(".gemified"))
+      @settings = load
     end
-  rescue Errno::EACCES
-    @result = "Can't read .gemified"
   end
   
   def files
-    @files ||= if not @from_vcs and m=MANIFEST.detect{|x|File.exist?(x)}
+    @files ||= if m=MANIFEST.detect{|x|File.exist?(x)}
       File.read(m).split(/\r?\n/)
-    else
+    elsif @from_vcs
       VCS.files
+    else
+      VCS.files(:unknown)
     end
   end
   
@@ -106,7 +106,7 @@ class Gemify
         s.add_dependency dep
       end
       
-      @settings.each { |key, v| s.send("#{key}=",value(key)) }
+      @settings.each { |key, value| s.send("#{key}=",value) }
       s.platform = Gem::Platform::RUBY
       s.files = files
       s.bindir = "bin"
@@ -123,6 +123,23 @@ class Gemify
       
     end).build
     raise Exit
+  end
+  
+  def load
+    s = YAML.load(File.read(".gemified"))
+    s.each do |key, value|
+      s[key] = case type(key)
+      when :array
+        value.to_a
+      when :boolean
+        !!value
+      when :string
+        value.to_s
+      end
+    end
+    s
+  rescue Errno::EACCES
+    @result = "Can't read .gemified"
   end
   
   def save
