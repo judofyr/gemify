@@ -19,6 +19,7 @@ class Gemify
   TYPE = {
     :has_rdoc => :boolean,
     :dependencies => :array,
+    :version => :string
   }
   
   def initialize
@@ -101,7 +102,7 @@ class Gemify
         s.add_dependency dep
       end
       
-      @settings.each { |key, value| s.send("#{key}=",value.to_s) }
+      @settings.each { |key, v| s.send("#{key}=",value(key)) }
       s.platform = Gem::Platform::RUBY
       s.files = files
       s.bindir = "bin"
@@ -169,6 +170,20 @@ class Gemify
   
   def type(m)
     TYPE[m]||:string
+  end
+  
+  def value(m)
+    i=@settings[m]
+    case type(m)
+      when :array
+        i = i.to_a
+      when :boolean
+        i = !!i
+      when :string
+        i = i.to_s
+    end
+    
+    i
   end
   
   def inspect_setting(m)
