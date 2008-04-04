@@ -3,3 +3,6 @@
 * Added has_rdoc to the options (Ben Wyrosdick)
 * Windows-support?
 * Little re-write of lib/gemify.rb
+* Added bin/gemify-manifest (David A. Cuadrad)
+* Added option to disable interactivity (David A. Cuadrad)
+* Binaries will now read from the manifest

@@ -19,13 +19,12 @@ class Gemify
   
   def initialize
     @settings = {}
-    @bin = Dir["bin/**/*"]
-    
+
     if files.empty?
       puts "Can't find anything to make a gem out of..."
       raise Exit
     end
-    
+
     if File.exists? ".gemified"
       @settings = YAML.load(open(".gemified"))
     end
@@ -37,8 +36,12 @@ class Gemify
     @files ||= if m=MANIFEST.detect{|x|File.exist?(x)}
       File.read(m).split(/\r?\n/)
     else
-      @bin + Dir["lib/**/*"]
+      Dir["bin/*"] + Dir["lib/**/*"]
     end
+  end
+  
+  def bin
+    files.select { |file| file =~ /^bin\// }
   end
   
   def main
@@ -102,8 +105,8 @@ class Gemify
       s.bindir = "bin"
       s.require_path = "lib"
 
-      unless @bin.empty?
-        s.executables = @bin.map{|x|x[4..-1]}
+      unless bin.empty?
+        s.executables = bin.map{|x|x[4..-1]}
       end
     end).build
     raise Exit
@@ -139,8 +142,8 @@ class Gemify
     menu
     case type(m)
     when :array
-      puts "Write all your dependencies here, split by ENTER and"
-      puts "press ENTER twice when you're done:"
+      puts "Split by ENTER and press ENTER twice when you're done"
+      puts "> #{show(m).capitalize}: "
       @settings[m] = $stdin.gets($/*2).strip.split($/)
       @settings.delete(m) if @settings[m].empty?
     when :boolean
