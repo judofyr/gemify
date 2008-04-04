@@ -3,12 +3,39 @@
 $:.unshift File.dirname(__FILE__)+"/../lib"
 
 require 'gemify'
+require 'optparse'
 
-interactive = !ARGV.detect { |e| e =~ (/^(--no-interactive|-I)$/) }
+options = {}
+options[:interactive] = true # Interactive by default
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: #{opts.program_name} [options]"
+  opts.separator ""
+  opts.separator "Options:"
+  opts.on("-h", "--help",  "Shows this message") do |val|
+    $stdout.puts opts
+    exit(0)
+  end
+  opts.on("-I", "--no-interactive") do |val|
+    options[:interactive] = false
+  end
+  opts.on("-c", "--from-vcs", "Use files from version control system" ) do |val|
+    options[:vcs] = true
+  end
+end
+
+begin
+  parser.parse!(ARGV)
+rescue => e
+  $stderr.puts "Error: #{e.message}"
+  $stdout.puts parser
+  exit -1
+end
 
 begin
   gemify = Gemify.new
-  if not interactive and File.exist?(".gemified")
+  gemify.from_vcs = !!options[:vcs]
+  if not options[:interactive] and File.exist?(".gemified")
     gemify.build
   else
     gemify.main

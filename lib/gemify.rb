@@ -5,6 +5,8 @@ require 'yaml'
 require 'gemify_vcs'
 
 class Gemify
+  attr_accessor :from_vcs
+  
   class Exit < StandardError;end
   MANIFEST = ["MANIFEST", "Manifest.txt", ".manifest"]
   REQUIRED = [:name, :summary, :version]
@@ -21,11 +23,7 @@ class Gemify
   
   def initialize
     @settings = {}
-
-    if files.empty?
-      puts "Can't find anything to make a gem out of..."
-      raise Exit
-    end
+    @from_vcs = false
 
     if File.exists? ".gemified"
       @settings = YAML.load(open(".gemified"))
@@ -35,7 +33,7 @@ class Gemify
   end
   
   def files
-    @files ||= if m=MANIFEST.detect{|x|File.exist?(x)}
+    @files ||= if not @from_vcs and m=MANIFEST.detect{|x|File.exist?(x)}
       File.read(m).split(/\r?\n/)
     else
       VCS.files
@@ -77,6 +75,7 @@ class Gemify
   end
   
   def menu
+    require_files!
     clear
     puts "Welcome to Gemify!"
     puts
@@ -96,6 +95,7 @@ class Gemify
   ## Special tasks
   
   def build
+    require_files!
     Gem::Builder.new(Gem::Specification.new do |s|
       (@settings.delete(:dependencies)||[]).each do |dep|
         s.add_dependency dep
@@ -180,6 +180,14 @@ class Gemify
       (i||false).to_s
     when :string
       i.to_s
+    end
+  end
+  
+  protected
+  def require_files!
+    if files.empty?
+      puts "Can't find anything to make a gem out of..."
+      raise Exit
     end
   end
 end
