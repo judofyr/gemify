@@ -32,10 +32,10 @@ class Gemify
   end
   
   def files
-    @files ||= if m=MANIFEST.detect{|x|File.exist?(x)}
-      File.read(m).split(/\r?\n/)
-    elsif @from_vcs
+    @files ||= if @from_vcs
       VCS.files
+    elsif m=MANIFEST.detect{|x|File.exist?(x)}                 
+      File.read(m).split(/\r?\n/)
     else
       VCS.files(:unknown)
     end
