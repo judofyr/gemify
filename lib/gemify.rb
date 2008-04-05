@@ -116,9 +116,8 @@ class Gemify
         s.executables = bin.map{|x|x[4..-1]}
       end
       
-      exts = extensions
-      unless exts.empty?
-        s.extensions = exts
+      unless extensions.empty?
+        s.extensions = extensions
       end
       
     end).build
