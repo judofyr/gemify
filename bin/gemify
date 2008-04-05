@@ -16,7 +16,7 @@ parser = OptionParser.new do |opts|
     $stdout.puts opts
     exit(0)
   end
-  opts.on("-I", "--no-interactive") do |val|
+  opts.on("-I", "--no-interactive", "Automaticically builds the gem") do |val|
     options[:interactive] = false
   end
   opts.on("-c", "--from-vcs", "Use files from version control system" ) do |val|
