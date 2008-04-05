@@ -19,7 +19,6 @@ class Gemify
   TYPE = {
     :has_rdoc => :boolean,
     :dependencies => :array,
-    :version => :string
   }
   
   def initialize
@@ -27,7 +26,7 @@ class Gemify
     @from_vcs = false
 
     if File.exists? ".gemified"
-      @settings = load
+      load
     end
   end
   
@@ -126,18 +125,10 @@ class Gemify
   end
   
   def load
-    s = YAML.load(File.read(".gemified"))
-    s.each do |key, value|
-      s[key] = case type(key)
-      when :array
-        value.to_a
-      when :boolean
-        !!value
-      when :string
-        value.to_s
-      end
+    @settings = YAML.load(File.read(".gemified"))
+    @settings.keys.each do |key|
+      @settings[key] = value(key)
     end
-    s
   rescue Errno::EACCES
     @result = "Can't read .gemified"
   end
@@ -202,15 +193,13 @@ class Gemify
   def value(m)
     i=@settings[m]
     case type(m)
-      when :array
-        i = i.to_a
-      when :boolean
-        i = !!i
-      when :string
-        i = i.to_s
+    when :array
+      i.to_a
+    when :boolean
+      !!i
+    when :string
+      i.to_s
     end
-    
-    i
   end
   
   def inspect_setting(m)
