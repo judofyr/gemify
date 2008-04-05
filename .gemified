@@ -6,3 +6,4 @@
 :summary: An extremely simple way to create a RubyGem
 :email: judofyr@gmail.com
 :homepage: http://dojo.rubyforge.org
+:has_rdoc: true

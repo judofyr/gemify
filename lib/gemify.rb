@@ -19,6 +19,7 @@ class Gemify
   TYPE = {
     :has_rdoc => :boolean,
     :dependencies => :array,
+    :version => :string
   }
   
   def initialize
@@ -42,6 +43,10 @@ class Gemify
   
   def bin
     files.select { |file| file =~ /^bin\// }
+  end
+  
+  def extensions
+    files.select { |file| file =~ /extconf\.rb$/ }
   end
   
   def main
@@ -110,6 +115,12 @@ class Gemify
       unless bin.empty?
         s.executables = bin.map{|x|x[4..-1]}
       end
+      
+      exts = extensions
+      unless exts.empty?
+        s.extensions = exts
+      end
+      
     end).build
     raise Exit
   end
@@ -186,6 +197,20 @@ class Gemify
   
   def type(m)
     TYPE[m]||:string
+  end
+  
+  def value(m)
+    i=@settings[m]
+    case type(m)
+      when :array
+        i = i.to_a
+      when :boolean
+        i = !!i
+      when :string
+        i = i.to_s
+    end
+    
+    i
   end
   
   def inspect_setting(m)
