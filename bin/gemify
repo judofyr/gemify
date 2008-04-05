@@ -35,8 +35,8 @@ end
 begin
   gemify = Gemify.new
   gemify.from_vcs = !!options[:vcs]
-  if not options[:interactive] and File.exist?(".gemified")
-    gemify.build
+  if not options[:interactive] and File.exist?(Gemify::SETTINGS)
+    gemify.build!
   else
     gemify.main
   end

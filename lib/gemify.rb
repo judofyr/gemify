@@ -8,6 +8,7 @@ class Gemify
   attr_accessor :from_vcs
   
   class Exit < StandardError;end
+  SETTINGS = ".gemified"
   MANIFEST = ["MANIFEST", "Manifest.txt", ".manifest"]
   REQUIRED = [:name, :summary, :version]
   OPTIONAL = [:author, :email, :homepage, :rubyforge_project, :has_rdoc, :dependencies]
@@ -25,8 +26,8 @@ class Gemify
     @settings = {}
     @from_vcs = false
 
-    if File.exists? ".gemified"
-      load
+    if File.exists? SETTINGS
+      load!
     end
   end
   
@@ -60,9 +61,9 @@ class Gemify
       when ?x
         raise Exit
       when ?b
-        build
+        build!
       when ?s
-        save
+        save!
         next
       when ?i
         @result = "Included files:#{$/}" + files.join($/)
@@ -98,7 +99,7 @@ class Gemify
   
   ## Special tasks
   
-  def build
+  def build!
     require_files!
     Gem::Builder.new(Gem::Specification.new do |s|
       (@settings.delete(:dependencies)||[]).each do |dep|
@@ -124,20 +125,20 @@ class Gemify
     raise Exit
   end
   
-  def load
-    @settings = YAML.load(File.read(".gemified"))
+  def load!
+    @settings = YAML.load(File.read(SETTINGS))
     @settings.keys.each do |key|
       @settings[key] = value(key)
     end
   rescue Errno::EACCES
-    @result = "Can't read .gemified"
+    @result = "Can't read #{SETTINGS}"
   end
   
-  def save
-    File.open(".gemified","w"){|f|f << YAML.dump(@settings)}
+  def save!
+    File.open(SETTINGS,"w"){|f|f << YAML.dump(@settings)}
     @result = "Saved!"
   rescue Errno::EACCES
-    @result = "Can't write to .gemified"
+    @result = "Can't write to #{SETTINGS}"
   end  
   
   def build_task(m)
