@@ -39,7 +39,7 @@ module Gemify
     end
     
     def binaries
-      files.select { |file| file =~ /^bin\// }
+      files.select { |file| file =~ /^bin\/[^\/]+$/ }
     end
     
     def extensions
@@ -109,13 +109,13 @@ module Gemify
       
     def specification
       ensure_settings!
-      
+      se = settings.clone
       Gem::Specification.new do |s|
-        (settings.delete(:dependencies)||[]).each do |dep|
+        (se.delete(:dependencies)||[]).each do |dep|
           s.add_dependency(dep)
         end
 
-        settings.each { |key, value| s.send("#{key}=",value) }
+        se.each { |key, value| s.send("#{key}=",value) }
         s.platform = Gem::Platform::RUBY
         s.files = files
         s.bindir = "bin"
