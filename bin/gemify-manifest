@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# DEPRECATED: Just here so we can easily merge it to the new source
 
 $:.unshift File.dirname(__FILE__)+"/../lib"
 

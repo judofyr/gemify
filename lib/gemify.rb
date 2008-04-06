@@ -1,3 +1,5 @@
+# DEPRECATED: Just here so we can easily merge it to the new source
+
 require 'rubygems'
 require 'rubygems/builder'
 require 'yaml'

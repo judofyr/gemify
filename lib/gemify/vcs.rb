@@ -1,3 +1,4 @@
+# DEPRECATED: Just here so we can easily merge it to the new source
 
 require 'open3'
 
