@@ -2,6 +2,48 @@ module Gemify
   module Manifest
     FILES = ["MANIFEST", "Manifest.txt", ".manifest"]
     class << self
+      
+      def auto
+        v = file
+        return v unless v.empty?
+        v = vcs
+        return v unless v.empty?
+        basic
+      end
+      
+      def file
+        if m = FILES.detect{ |x| File.exist?(x) }
+          File.read(m).split(/\r?\n/)
+        else
+          []
+        end 
+      end
+
+      def vcs(forced_vcs = false)
+        case (forced_vcs || determine_vcs)
+        when :git
+          get_files_from_command("git-ls-files").delete_if { |w| w == ".gitignore" or w == ".gitattributes" }
+        when :darcs
+          get_files_from_command("darcs query manifest")
+        when :bzr
+          get_files_from_command("bzr ls").delete_if { |w| w == ".bzrignore" }
+        when :hg
+          get_files_from_command("hg manifest")
+        when :svn
+          get_files_from_command("svn ls")
+        when :cvs
+          get_files_from_command("cvs ls")
+        else
+          []
+        end
+      end
+      
+      def basic
+        Dir["bin/*"] + Dir["lib/**/**"]
+      end
+      
+      private
+      
       def determine_vcs
         if File.exist?(".git")
           :git
@@ -31,45 +73,6 @@ module Gemify
         end
         
         files
-      end
-      
-      def from_vcs(forced_vcs = false)
-        case (forced_vcs || determine_vcs)
-        when :git
-          get_files_from_command("git-ls-files").delete_if { |w| w == ".gitignore" or w == ".gitattributes" }
-        when :darcs
-          get_files_from_command("darcs query manifest")
-        when :bzr
-          get_files_from_command("bzr ls").delete_if { |w| w == ".bzrignore" }
-        when :hg
-          get_files_from_command("hg manifest")
-        when :svn
-          get_files_from_command("svn ls")
-        when :cvs
-          get_files_from_command("cvs ls")
-        when :unknown
-          Dir['bin/*'] + Dir['lib/**/**']    
-        end
-      end
-      
-      def from_file(filename)
-        File.read(filename).split(/\r?\n/)        
-      end
-      
-      def basic
-        from_vcs(:unknown)
-      end
-      
-      def manifest_file
-        if m = FILES.detect{ |x| File.exist?(x) }
-          from_file(m)
-        end 
-      end
-      
-      def auto
-        if    manifest_file
-        else  from_vcs
-        end
       end
     end
   end

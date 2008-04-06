@@ -20,6 +20,15 @@ module Gemify
       @settings = settings
     end
     
+    def settings=(new)
+      @settings = new
+      ensure_settings!
+    end
+    
+    def [](key)
+      settings[key]
+    end
+    
     def binaries
       files.select { |file| file =~ /^bin\// }
     end
@@ -60,7 +69,7 @@ module Gemify
     #   name(:name)              #=> "name"
     #   name(:rubyforge_project) #=> "RubyForge project"
     def name(setting)
-      REPLACE[setting] || m.to_s
+      REPLACE[setting] || setting.to_s
     end
     
     # Casts +value+ to the right type according to +setting+
@@ -83,6 +92,18 @@ module Gemify
         i unless i.empty?
       when :boolean
         true if !!value
+      end
+    end
+    
+    def show(setting)
+      i = settings[setting]
+      case type(setting)
+      when :array
+        i.join(", ")
+      when :boolean
+        (!!i).to_s
+      when :string
+        i
       end
     end
       
@@ -118,7 +139,7 @@ module Gemify
       valid? && Gem::Builder.new(spec).build
     end
     
-    private
+    #private
     
     def ensure_settings!
       settings.each do |key, value|

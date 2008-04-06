@@ -1,5 +1,4 @@
 #!/usr/bin/env ruby
-# DEPRECATED: Just here so we can easily merge it to the new source
 
 $:.unshift File.dirname(__FILE__)+"/../lib"
 
@@ -9,5 +8,5 @@ manifest = (ARGV.first || ".manifest")
 
 $stdout.puts "=> Generating #{manifest}"
 File.open(manifest, "w") do |file|
-  file << Gemify::VCS.files.join("\n")
+  file << Gemify::Manifest.auto.join("\n")
 end
