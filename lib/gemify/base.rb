@@ -15,9 +15,9 @@ module Gemify
       :dependencies => :array,
     }
     
-    def initialize(files, settings = {})
+    def initialize(files)
       @files = files
-      @settings = settings
+      @settings = {}
     end
     
     def settings=(new)
