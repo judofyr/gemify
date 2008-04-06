@@ -8,5 +8,5 @@ manifest = (ARGV.first || ".manifest")
 
 $stdout.puts "=> Generating #{manifest}"
 File.open(manifest, "w") do |file|
-  file << Gemify::VCS.files.join("\n")
+  file << Gemify::Manifest.auto.join("\n")
 end

@@ -6,7 +6,9 @@ require 'gemify'
 require 'optparse'
 
 options = {}
+options[:manifest] = :auto
 options[:interactive] = true # Interactive by default
+options[:included_files] = false
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{opts.program_name} [options]"
@@ -19,8 +21,19 @@ parser = OptionParser.new do |opts|
   opts.on("-I", "--no-interactive", "Automaticically builds the gem") do |val|
     options[:interactive] = false
   end
-  opts.on("-c", "--from-vcs", "Use files from version control system" ) do |val|
-    options[:vcs] = true
+  opts.on("-i", "--included-files", "Show included files") do |val|
+    options[:included_files] = true
+  end
+  opts.on("-m", "--manifest TYPE",
+    "Where to look for the manifest:",
+    "  file = Inside a MANIFEST-file",
+    "  vcs = Search inside different VCS",
+    "  basic = lib/ + bin/",
+    "  auto (default) = Tries all of the above",
+    " ",
+    "You can also give it a single VCS:",
+    "git, darcs, hg, bzr, svn or cvs") do |val|
+    options[:manifest] = val.to_sym
   end
 end
 
@@ -33,13 +46,19 @@ rescue => e
 end
 
 begin
-  gemify = Gemify.new
-  gemify.from_vcs = !!options[:vcs]
-  if not options[:interactive] and File.exist?(Gemify::SETTINGS)
-    gemify.build!
+  cli = Gemify::CLI.new(options[:manifest])
+  if options[:included_files]
+    puts cli.base.files
+  elsif options[:interactive]
+    cli.main
   else
-    gemify.main
+    unless cli.base.build!
+      puts
+      puts "If you want to use this options, you need to run"
+      puts "gemify, set the required options and save it."
+      puts
+    end
   end
-rescue Gemify::Exit
-  exit
+rescue Gemify::CLI::EmptyManifest
+  puts "Can't find anything to make a gem out of..."
 end
