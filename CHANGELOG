@@ -1,3 +1,16 @@
+== 0.2.4 - 2008-04-06
+* Added Sake-task
+* Added has_rdoc to the options (Ben Wyrosdick)
+* Windows-support?
+* Little re-write of lib/gemify.rb
+* Added bin/gemify-manifest (David A. Cuadrad)
+* Added option to disable interactivity (David A. Cuadrad)
+* Binaries will now read from the manifest
+* Added an option parser (David A. Cuadrad)                                   
+* Added option to build the gem using the VCS tree (David A. Cuadrad)
+* The settings from .gemified will now read as correct type (David A. Cuadrad)
+* Rubinius-support (no test/spec = can't verify, but I think so)
+
 == 0.2.3 - 2008-03-23
 * Require rubygems/builder (defunkt)
 * Made it simpler to test in developement
