@@ -94,12 +94,12 @@ module Gemify
       when :array
         puts "Split by ENTER and press ENTER twice when you're done"
         puts "> #{base.name(m).capitalize}: "
-        base.set(m, $stdin.gets($/*2).strip.split($/))
+        base[m] = $stdin.gets($/*2).strip.split($/)
       when :boolean
-        base.set(m, !base[m])
+        base[m] = !base[m]
       when :string
         print "> #{base.name(m).capitalize}: "
-        base.set(m, $stdin.gets.strip)
+        base[m] = $stdin.gets.strip
       end
       @result = "Updated '#{m}'"
     end

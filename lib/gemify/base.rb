@@ -25,8 +25,17 @@ module Gemify
       ensure_settings!
     end
     
-    def [](key)
-      settings[key]
+    def [](setting)
+      settings[setting]
+    end
+    
+    # Sets the +setting+ to +value+
+    def []=(setting, value)
+      if v = cast(setting, value)
+        settings[setting] = v
+      else
+        settings.delete(setting)
+      end
     end
     
     def binaries
@@ -43,15 +52,6 @@ module Gemify
         return false unless settings.keys.include?(req)
       end
       true
-    end
-    
-    # Sets the +setting+ to +value+
-    def set(setting, value)
-      if v = cast(setting, value)
-        settings[setting] = v
-      else
-        settings.delete(setting)
-      end
     end
     
     # Returns the type of a setting, defaults to :string 
@@ -143,7 +143,7 @@ module Gemify
     
     def ensure_settings!
       settings.each do |key, value|
-        set(key, value)
+        self[key] = value
       end
     end                  
   end
