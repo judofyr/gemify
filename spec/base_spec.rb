@@ -116,5 +116,7 @@ describe Gemify::Base do
     d.keys.each do |key|
       spec.send(key).should == d[key]
     end
+    spec.extensions.should == ["lib/extconf.rb"]
+    spec.executables.should == ["program"]
   end
 end
