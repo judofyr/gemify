@@ -118,5 +118,9 @@ describe Gemify::Base do
     end
     spec.extensions.should == ["lib/extconf.rb"]
     spec.executables.should == ["program"]
+    spec.files.should == @files
+    spec.bindir.should == "bin"
+    spec.require_path.should == "lib"
+    spec.platform.should == Gem::Platform::RUBY
   end
 end
