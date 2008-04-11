@@ -1,8 +1,15 @@
 module Gemify
+  # A simple module to figure out which files that should be included in the
+  # gem.
+  #
+  # == Using
+  # #auto:: Automatically find the files.
+  # #file, #vcs or #basic:: Find the files the specific place.
   module Manifest
     FILES = ["MANIFEST", "Manifest.txt", ".manifest"]
     class << self
       
+      # Returns the first of #file, #vcs and #basic which returns a non-empty list.
       def auto
         v = file
         return v unless v.empty?
@@ -11,6 +18,8 @@ module Gemify
         basic
       end
       
+      # Looks for the manifest in MANIFEST, Manifest.txt and .manifest,
+      # separated by newline.
       def file
         if m = FILES.detect{ |x| File.exist?(x) }
           File.read(m).split(/\r?\n/)
@@ -18,7 +27,11 @@ module Gemify
           []
         end 
       end
-
+      
+      # Determine which VCS you're using and returns all the files which are
+      # under revision control.
+      #
+      # Set +forced_vcs+ to a single VCS to look for files in that specific VCS.
       def vcs(forced_vcs = false)
         case (forced_vcs || determine_vcs)
         when :git
@@ -38,6 +51,7 @@ module Gemify
         end
       end
       
+      # Returns the most basic manifest: All files in lib/ and bin/
       def basic
         Dir["bin/*"] + Dir["lib/**/**"]
       end

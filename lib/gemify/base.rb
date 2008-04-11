@@ -1,4 +1,18 @@
 module Gemify
+  # A class providing base functions for generating gems. It doesn't know
+  # anything about the filesystem nor using any magic; you have to give it
+  # all the information.
+  #
+  # == Using
+  #
+  #   base = Gemify::Base.new(["lib/file.rb", "bin/program"])
+  #   base.settings = {:name => "testing"}
+  #   base[:version] = 0.9
+  #   base.valid? #=> false
+  #   base[:summary] = "A short summary"
+  #   base.valid? #=> true
+  #
+  #   base.build! # Builds the gem
   class Base
     attr_accessor :files
     attr_reader :settings
@@ -20,11 +34,12 @@ module Gemify
       @settings = {}
     end
     
-    def settings=(new)
-      @settings = new
+    def settings=(hash)
+      @settings = hash
       ensure_settings!
     end
     
+    # Returns the content of +setting+
     def [](setting)
       settings[setting]
     end
@@ -38,10 +53,12 @@ module Gemify
       end
     end
     
+    # Returns all the binaries in the file list
     def binaries
       files.select { |file| file =~ /^bin\/[^\/]+$/ }
     end
     
+    # Returns all the extensions in the file list
     def extensions
       files.select { |file| file =~ /extconf\.rb$/ }
     end
@@ -74,6 +91,8 @@ module Gemify
     
     # Casts +value+ to the right type according to +setting+
     #
+    # Returns nil if +value+ is empty, false or nil.
+    #
     #   cast(:has_rdoc, "VICTORY!")      #=> true
     #   cast(:dependencies, "merb-core") #=> ["merb-core"]
     #   cast(:version, 0.2)              #=> "0.2"
@@ -95,6 +114,12 @@ module Gemify
       end
     end
     
+    # Shows the content of +setting+ as a String.
+    #
+    #   show(:has_rdoc)     #=> "true"
+    #   show(:version)      #=> "0.9"
+    #   show(:dependencies) #=> "rubygems, merb-core" 
+    #   show(:author)       #=> nil
     def show(setting)
       i = settings[setting]
       case type(setting)
@@ -106,7 +131,8 @@ module Gemify
         i
       end
     end
-      
+    
+    # Creates a Gem::Specification+ based on +@files+ and +@settings+  
     def specification
       ensure_settings!
       se = settings.clone
@@ -131,7 +157,7 @@ module Gemify
       end
     end
     
-    # Builds the gem
+    # Builds the gem if it's valid
     def build!
       # We need to load the specification before valid?
       # in order to ensure_settings!
@@ -139,8 +165,7 @@ module Gemify
       valid? && Gem::Builder.new(spec).build
     end
     
-    #private
-    
+    # Ensures that all settings are properly cast.
     def ensure_settings!
       settings.each do |key, value|
         self[key] = value
