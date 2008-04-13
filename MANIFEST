@@ -10,4 +10,3 @@ lib/gemify/cli.rb
 lib/gemify/manifest.rb
 spec/base_spec.rb
 spec/spec_helper.rb
-tasks/gemify.tasks
