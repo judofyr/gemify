@@ -1,5 +1,5 @@
 module Gemify
-  class UI
+  module UI
     class EmptyManifest < StandardError; end
 
     def self.use(name)
