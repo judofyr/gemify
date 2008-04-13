@@ -7,4 +7,4 @@ require 'open3'
 
 require 'gemify/base'
 require 'gemify/manifest'
-require 'gemify/cli'
+require 'gemify/ui'
