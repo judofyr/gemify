@@ -9,6 +9,7 @@ options = {}
 options[:manifest] = :auto
 options[:interactive] = true # Interactive by default
 options[:included_files] = false
+options[:ui] = "cli"
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: #{opts.program_name} [options]"
@@ -35,6 +36,9 @@ parser = OptionParser.new do |opts|
     "git, darcs, hg, bzr, svn or cvs") do |val|
     options[:manifest] = val.to_sym
   end
+  opts.on("-u", "--ui NAME", "Specifies user interface") do |name|
+    options[:ui] = name
+  end
 end
 
 begin
@@ -46,7 +50,7 @@ rescue => e
 end
 
 begin
-  ui = Gemify::UI.use(:cli).new(options[:manifest])
+  ui = Gemify::UI.use(options[:ui]).new(options[:manifest])
   if options[:included_files]
     puts ui.base.files
   elsif options[:interactive]
