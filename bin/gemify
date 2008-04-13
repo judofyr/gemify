@@ -46,19 +46,19 @@ rescue => e
 end
 
 begin
-  cli = Gemify::CLI.new(options[:manifest])
+  ui = Gemify::UI.use(:cli).new(options[:manifest])
   if options[:included_files]
-    puts cli.base.files
+    puts ui.base.files
   elsif options[:interactive]
-    cli.main
+    ui.main
   else
-    unless cli.base.build!
+    unless ui.base.build!
       puts
       puts "If you want to use this options, you need to run"
       puts "gemify, set the required options and save it."
       puts
     end
   end
-rescue Gemify::CLI::EmptyManifest
+rescue Gemify::UI::EmptyManifest
   puts "Can't find anything to make a gem out of..."
 end
