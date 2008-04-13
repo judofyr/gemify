@@ -1,28 +1,6 @@
 module Gemify
   module UI
-    class CLI
-      attr_reader :base
-
-      SETTINGS = ".gemified"
-      VCS = [:git, :darcs, :hg, :bzr, :svn, :cvs]
-      MODE = [:auto, :file, :vcs, :basic]
-
-      def initialize(manifest = :auto)
-        m = case manifest
-            when *VCS
-              Manifest.vcs(manifest)
-            when *MODE
-              Manifest.send(manifest)
-            else
-              []
-            end
-
-        raise EmptyManifest if m.empty?
-
-        @base = Base.new(m)
-        load!
-      end
-
+    class CLI < InterfaceBase
       def main
         loop do
           menu
@@ -106,21 +84,6 @@ module Gemify
       def gets
         print "> "
         $stdin.gets.strip
-      end
-
-      def load!
-        if File.exists?(SETTINGS)
-          base.settings = YAML.load(File.read(SETTINGS))
-        end
-      rescue Errno::EACCES
-        @result = "Can't read #{SETTINGS}"
-      end
-
-      def save!
-        File.open(SETTINGS, "w"){ |f| f << YAML.dump(base.settings) }
-        @result = "Saved the settings to #{SETTINGS}"
-      rescue Errno::EACCES
-        @result = "Can't write #{SETTINGS}"
       end
 
       def clear
