@@ -1,6 +1,5 @@
 require "delegate"
 require "curses"
-require "readline"
 
 module Gemify
   module UI
