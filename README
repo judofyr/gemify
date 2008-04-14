@@ -8,12 +8,26 @@ building a gem. And that's when you should use Gemify!
 == How
 Gemify gives you one single executable you should run: gemify. It does
 one thing and, hopefully, it does it well. All you need to do is to run that
-command in your project-folder. All your files in the lib-folder will be
-requirable and all your files in the bin-folder will be executable.
+command in your project-folder.
 
-When you run gemify it will asks you some questions, and give you the option
-to save your settings (in the file .gemified). So you should never need to
-re-enter anything.
+Then it will automatically detect which VCS you're using and include the files
+which are under version control. If you're not using a VCS it will just
+include the files in the bin- and lib-folders
+
+If you need more control over the included files, you should create a file
+named MANIFEST (or Manifest.txt or .manifest) with the filenames separated by
+newline. (You can also generate one by running <tt>gemify-manifest</tt>)
+
+You are free to structure your programs the way to want, but remember: Only
+the files in the lib-folder will be requirable and only the files in the
+bin-folder will be executable.
+
+You will also have the option to save your settings (to .gemified) so you
+should never need to re-enter anything.
+
+== As a library
+If you want to use Gemify as a library, please look at Gemify::CLI and
+Gemify::Base.
 
 == Install
 sudo gem install gemify
@@ -22,3 +36,8 @@ sudo gem install gemify
 The source is availble at Gitorious[http://gitorious.org/projects/gemify] and
 if you want to improve it, simply fork it and implement your awesome ideas
 there. You can also send your patches by email to judofyr@gmail.com.
+
+== Contributors
+* David A. Cuadrado
+* Ben Wyrosdick
+* Chris Wanstrath
