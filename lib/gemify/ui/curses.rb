@@ -134,11 +134,8 @@ module Gemify
             when ?u, ::Curses::KEY_UP     ; up
             when ?d, ::Curses::KEY_DOWN   ; down
             when ?c, ::Curses::KEY_CTRL_J ; change
-            when ?b
-              unless @base.build! && exit
-                @result = "You need to fill out all the required fields"
-              end
-            when ?s; save!
+            when ?b; build
+            when ?s; save
             when ?i; IncludedFiles.new(@base.files)
             when ?q; quit
             else
@@ -162,6 +159,15 @@ module Gemify
 
         def down
           @position += 1 unless @position == @tasks.size - 1
+        end
+
+        def build
+          unless @base.build!
+            @result = "You need to fill out all the required fields"
+          else
+            gemname = "#{@base.show(:name)}-#{@base.show(:version)}.gem"
+            @result = "Created " + gemname
+          end
         end
 
         def save
