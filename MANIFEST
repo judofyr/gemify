@@ -9,6 +9,5 @@ lib/gemify/base.rb
 lib/gemify/manifest.rb
 lib/gemify/ui.rb
 lib/gemify/ui/cli.rb
-lib/gemify/ui/curses.rb
 spec/base_spec.rb
 spec/spec_helper.rb

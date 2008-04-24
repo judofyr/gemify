@@ -36,9 +36,9 @@ parser = OptionParser.new do |opts|
     "git, darcs, hg, bzr, svn or cvs") do |val|
     options[:manifest] = val.to_sym
   end
-  opts.on("-u", "--ui NAME", "Specifies user interface") do |name|
-    options[:ui] = name
-  end
+  #opts.on("-u", "--ui NAME", "Specifies user interface") do |name|
+  #  options[:ui] = name
+  #end
 end
 
 begin
@@ -57,10 +57,8 @@ begin
     ui.main
   else
     unless ui.base.build!
-      puts
       puts "If you want to use this options, you need to run"
       puts "gemify, set the required options and save it."
-      puts
     end
   end
 rescue Gemify::UI::EmptyManifest

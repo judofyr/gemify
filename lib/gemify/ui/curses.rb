@@ -2,8 +2,8 @@ require "delegate"
 require "curses"
 
 module Gemify
-  module UI
-    class Curses < InterfaceBase
+  class UI
+    class Curses < self
       include ::Curses
 
       def main
@@ -188,6 +188,7 @@ Changes are not saved. Quit? (y or n)
           task = @tasks[@position]
           case @base.type(task)
           when :array
+            File.open("b","w"){|x|x<<@base.inspect}
             res = @display.input "#{@base.name(task).capitalize}(Split by SPACE)"
             @base[task] = res.strip.split(" ")
           when :boolean

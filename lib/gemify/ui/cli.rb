@@ -1,7 +1,7 @@
 module Gemify
-  module UI
-    class CLI < InterfaceBase
-      def main
+  class UI
+    class CLI < self
+       def main
         loop do
           menu
           @result = puts @result if @result
