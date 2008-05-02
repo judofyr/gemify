@@ -2,6 +2,7 @@ module Gemify
   class UI
     class EmptyManifest < StandardError; end
 
+    UIS = ["CLI"]
     SETTINGS = ".gemified"
     VCS = [:git, :darcs, :hg, :bzr, :svn, :cvs]
     MODE = [:auto, :file, :vcs, :basic]
@@ -40,17 +41,13 @@ module Gemify
     end 
 
     def self.use(name)
-      case name.to_s
-      when "cli"
-        require "gemify/ui/cli"
-        return Gemify::UI::CLI
-      #when "curses"
-      #  require "gemify/ui/curses"
-      #  return Gemify::UI::Curses
+      file = name.to_s.downcase
+      if klass = UIS.find{ |x| x.downcase == file }
+        require "gemify/ui/#{file}"
+        return Gemify::UI.const_get(klass)
       else
         raise ArgumentError, "There is no UI named '#{name}'"
       end
     end
   end
-
 end

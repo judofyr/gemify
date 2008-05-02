@@ -36,9 +36,9 @@ parser = OptionParser.new do |opts|
     "git, darcs, hg, bzr, svn or cvs") do |val|
     options[:manifest] = val.to_sym
   end
-  #opts.on("-u", "--ui NAME", "Specifies user interface") do |name|
-  #  options[:ui] = name
-  #end
+  opts.on("-u", "--ui NAME", "Specifies user interface") do |name|
+    options[:ui] = name
+  end
 end
 
 begin
@@ -62,5 +62,7 @@ begin
     end
   end
 rescue Gemify::UI::EmptyManifest
-  puts "Can't find anything to make a gem out of..."
+  puts "Can't find anything to make a gem out of..."      
+rescue Exception => e
+  puts e.message
 end
