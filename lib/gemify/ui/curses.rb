@@ -1,3 +1,4 @@
+# Author: Keita Yamaguchi
 require "delegate"
 require "curses"
 

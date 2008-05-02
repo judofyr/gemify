@@ -1,3 +1,4 @@
+# Author: David A. Cuadrado
 module Gemify
   # A simple module to figure out which files that should be included in the
   # gem.
