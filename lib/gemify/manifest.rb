@@ -10,22 +10,16 @@ module Gemify
     FILES = ["MANIFEST", "Manifest.txt", ".manifest"]
     class << self
       
-      # Returns the first of #file, #vcs and #basic which returns a non-empty list.
+      # Returns the first of #file, #vcs and #basic which returns a list.
       def auto
-        v = file
-        return v unless v.empty?
-        v = vcs
-        return v unless v.empty?
-        basic
+        file || vcs || basic
       end
       
       # Looks for the manifest in MANIFEST, Manifest.txt and .manifest,
       # separated by newline.
       def file
-        if m = FILES.detect{ |x| File.exist?(x) }
+        if m = FILES.detect { |x| File.exist?(x) }
           File.read(m).split(/\r?\n/)
-        else
-          []
         end 
       end
       
@@ -33,10 +27,10 @@ module Gemify
       # under revision control.
       #
       # Set +forced_vcs+ to a single VCS to look for files in that specific VCS.
-      def vcs(forced_vcs = false)
-        case (forced_vcs || determine_vcs)
+      def vcs(forced_vcs = determine_vcs)
+        case forced_vcs
         when :git
-          get_files_from_command("git-ls-files").delete_if { |w| w == ".gitignore" or w == ".gitattributes" }
+          get_files_from_command("git ls-files").delete_if { |w| w == ".gitignore" or w == ".gitattributes" }
         when :darcs
           get_files_from_command("darcs query manifest")
         when :bzr
@@ -47,8 +41,6 @@ module Gemify
           get_files_from_command("svn ls")
         when :cvs
           get_files_from_command("cvs ls")
-        else
-          []
         end
       end
       
