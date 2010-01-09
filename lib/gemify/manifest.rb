@@ -7,20 +7,33 @@ module Gemify
   # #auto:: Automatically find the files.
   # #file, #vcs or #basic:: Find the files the specific place.
   module Manifest
-    FILES = ["MANIFEST", "Manifest.txt", ".manifest"]
+    MODE  = [:auto, :vcs, :basic]
+    VCS   = [:git, :darcs, :hg, :bzr, :svn, :cvs]
+    ALL   = MODE + VCS
+    
     class << self
       
-      # Returns the first of #file, #vcs and #basic which returns a list.
-      def auto
-        file || vcs || basic
+      def files(type)
+        return unless type.respond_to?(:to_sym)
+        type = type.to_sym
+        case type
+        when *VCS
+          vcs(type)
+        when *MODE
+          send(type)
+        else
+          file = type.to_s
+          if File.exists?(file)
+            File.read(file).split($/).compact.uniq
+          else
+            raise ArgumentError, "#{type} is not a valid manifest"
+          end
+        end
       end
       
-      # Looks for the manifest in MANIFEST, Manifest.txt and .manifest,
-      # separated by newline.
-      def file
-        if m = FILES.detect { |x| File.exist?(x) }
-          File.read(m).split(/\r?\n/)
-        end 
+      # Returns the first of #vcs and #basic which returns a list.
+      def auto
+        vcs || basic
       end
       
       # Determine which VCS you're using and returns all the files which are

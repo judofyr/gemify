@@ -1,68 +1,58 @@
 #!/usr/bin/env ruby
 
-$:.unshift File.dirname(__FILE__)+"/../lib"
-
+$:.unshift File.dirname(__FILE__) + '/../lib'
 require 'gemify'
-require 'optparse'
+require 'trollop'
 
-options = {}
-options[:manifest] = :auto
-options[:interactive] = true # Interactive by default
-options[:included_files] = false
-options[:ui] = "cli"
+gemspec = nil
+actions = [:new, :update, :manifest, :generate_manifest]
 
-parser = OptionParser.new do |opts|
-  opts.banner = "Usage: #{opts.program_name} [options]"
-  opts.separator ""
-  opts.separator "Options:"
-  opts.on("-h", "--help",  "Shows this message") do |val|
-    $stdout.puts opts
-    exit(0)
-  end
-  opts.on("-I", "--no-interactive", "Automaticically builds the gem") do |val|
-    options[:interactive] = false
-  end
-  opts.on("-i", "--included-files", "Show included files") do |val|
-    options[:included_files] = true
-  end
-  opts.on("-m", "--manifest TYPE",
-    "Where to look for the manifest:",
-    "  file = Inside a MANIFEST-file",
-    "  vcs = Search inside different VCS",
-    "  basic = lib/ + bin/",
-    "  auto (default) = Tries all of the above",
-    " ",
-    "You can also give it a single VCS:",
-    "git, darcs, hg, bzr, svn or cvs") do |val|
-    options[:manifest] = val.to_sym
-  end
-  opts.on("-u", "--ui NAME", "Specifies user interface") do |name|
-    options[:ui] = name
-  end
+opts = Trollop.options do
+  version "gemify 0.3"
+  banner <<-EOS
+Usage: #{$0} [OPTION]... [FILE]
+A simple gemspec editor
+  
+  EOS
+  
+  opt :new, "Create a new gemspec"
+  opt :update, "Update the manifest"
+  opt :manifest, "Dump the manifest"
+  opt :generate_manifest, "Generate a manifest", :type => :string
 end
 
-begin
-  parser.parse!(ARGV)
-rescue => e
-  $stderr.puts "Error: #{e.message}"
-  $stdout.puts parser
-  exit -1
-end
+action = opts.detect { |opt, val| actions.include?(opt) && val }
+action = action[0] unless action.nil?
 
-begin
-  ui = Gemify::UI.use(options[:ui]).new(options[:manifest])
-  if options[:included_files]
-    puts ui.base.files
-  elsif options[:interactive]
-    ui.main
+if action == :new || action == :generate_manifest
+  # do nothing
+elsif (arg = ARGV.shift).nil?
+  gemspecs = Dir['*.gemspec']
+  gemspec = case gemspecs.length
+  when 0
+    nil
+  when 1
+    gemspecs.first
   else
-    unless ui.base.build!
-      puts "If you want to use this options, you need to run"
-      puts "gemify, set the required options and save it."
-    end
+    gemspecs
   end
-rescue Gemify::UI::EmptyManifest
-  puts "Can't find anything to make a gem out of..."      
-rescue Exception => e
-  puts e.message
+elsif File.exists?(arg)
+  gemspec = arg
+else
+   Trollop.die "No such file: #{arg}"
+end
+
+Trollop.die "Extra operand: #{ARGV[0]}" unless ARGV.empty?
+  
+cli = Gemify::CLI.load(gemspec)
+
+case action
+when :update
+  puts "Updated manifest (to #{cli.base.files.length} files)"
+when :manifest
+  puts cli.base.inspect_files
+when :generate_manifest
+  puts Gemify::Manifest.files(opts[:generate_manifest])
+else
+  cli.main
 end
