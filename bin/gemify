@@ -48,6 +48,7 @@ cli = Gemify::CLI.load(gemspec)
 
 case action
 when :update
+  cli.save
   puts "Updated manifest (to #{cli.base.files.length} files)"
 when :manifest
   puts cli.base.inspect_files
