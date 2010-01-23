@@ -4,10 +4,11 @@ module Gemify
   # gem.
   #
   # == Using
-  # #auto:: Automatically find the files.
-  # #file, #vcs or #basic:: Find the files the specific place.
+  # {.files}:: Find the files based on the argument.
+  # {.auto}:: Automatically find the files.
+  # {.vcs}, {.basic} or {.all}:: Find the files the specific place.
   module Manifest
-    MODE  = [:auto, :vcs, :basic]
+    MODE  = [:auto, :vcs, :basic, :all]
     VCS   = [:git, :darcs, :hg, :bzr, :svn, :cvs]
     ALL   = MODE + VCS
     
@@ -31,9 +32,10 @@ module Gemify
         end
       end
       
-      # Returns the first of #vcs and #basic which returns a list.
+      # Uses the files from your VCS, falling back to all the files in
+      # the directory. 
       def auto
-        vcs || basic
+        vcs || all
       end
       
       # Determine which VCS you're using and returns all the files which are
@@ -60,6 +62,11 @@ module Gemify
       # Returns the most basic manifest: All files in lib/ and bin/
       def basic
         Dir["bin/*"] + Dir["lib/**/**"]
+      end
+      
+      # Returns all the files in a directory.
+      def all
+        Dir["**/*"]
       end
       
       private
