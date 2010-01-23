@@ -95,7 +95,17 @@ module Gemify
     end
     
     def change(m)
-      base[m] = gets(m.to_s.capitalize)
+      if Base.array_attributes.include?(m)
+        puts "Split by ENTER and press ENTER twice when you're done"
+        res = []
+        while !(val = gets.strip).empty?
+          res << val
+        end
+        base[m] = res
+      else
+        base[m] = gets(m.to_s.capitalize)
+      end
+      
       @saved = false
       @result = "Updated '#{m}'"
     rescue ArgumentError => e

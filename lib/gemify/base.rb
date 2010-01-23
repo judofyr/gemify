@@ -14,7 +14,7 @@ module Gemify
   #   base.build! # Builds the gem
   class Base < Gem::Specification
     REQUIRED = [:name, :summary, :version]
-    OPTIONAL = [:author, :email, :homepage, :manifest]
+    OPTIONAL = [:author, :email, :homepage, :manifest, :dependencies]
     ALL = REQUIRED + OPTIONAL
     
     attr_accessor :manifest
@@ -36,13 +36,29 @@ module Gemify
     
     # Returns the content of +setting+
     def [](setting)
-      send(setting) if respond_to?(setting)
+      val = send(setting) if respond_to?(setting)
+      if setting.to_s == "dependencies"
+        val.empty? ? nil : val.map do |dep|
+          "#{dep.name} #{dep.version_requirements}"
+        end.join(" & ")
+      else
+        val
+      end
     end
     
     # Sets the +setting+ to +value+
     def []=(setting, value)
-      value = nil if value.respond_to?(:empty?) && value.empty?
-      send("#{setting}=", value) if respond_to?("#{setting}=")
+      value = nil if value.is_a?(String) && value.empty?
+      
+      if setting.to_s == "dependencies"
+        self.dependencies = []
+        value.each do |dep|
+          name, *reqs = dep.split(",").map { |x| x.strip }
+          add_runtime_dependency(name, *reqs)
+        end
+      else
+        send("#{setting}=", value) if respond_to?("#{setting}=")
+      end
     end
     
     def to_ruby
