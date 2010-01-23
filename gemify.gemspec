@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors = ["Magnus Holm"]
   s.date = %q{2010-01-23}
   s.email = %q{judofyr@gmail.com}
-  s.files = ["CHANGELOG", "CHANGELOG.new", "README", "bin/gemify", "gemify.gemspec", "lib/gemify.rb", "lib/gemify/base.rb", "lib/gemify/cli.rb", "lib/gemify/manifest.rb", "lib/trollop.rb", "spec/spec_helper.rb"]
+  s.files = ["CHANGELOG", "README", "bin/gemify", "gemify.gemspec", "lib/gemify.rb", "lib/gemify/base.rb", "lib/gemify/cli.rb", "lib/gemify/manifest.rb", "lib/trollop.rb", "spec/spec_helper.rb"]
   s.homepage = %q{http://dojo.rubyforge.org/}
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.5}

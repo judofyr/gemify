@@ -1,3 +1,6 @@
+== 0.3
+* Gemify is now a gemspec editor!
+
 == 0.2.4 - 2008-04-06
 * Added Sake-task
 * Added has_rdoc to the options (Ben Wyrosdick)
