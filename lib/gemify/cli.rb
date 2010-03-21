@@ -1,10 +1,5 @@
 require 'readline'
 
-Readline.completion_append_character = ""
-Readline.completion_proc = proc do |str|
-  Dir[str+'*'].grep /^#{Regexp.escape(str)}/
-end
-
 module Gemify
   class CLI
     ACTIONS = {
@@ -23,7 +18,7 @@ module Gemify
     def self.load(file = nil)
       case file
       when nil
-        new(Base.new { |s| s.manifest = "auto" })
+        new(Base.new)
       when String
         new(Base.load(file), file)
       when Array
@@ -67,7 +62,12 @@ module Gemify
       puts
     end
     
+    def update_manifest
+      @base.files = Manifest.auto
+    end
+    
     def main
+      update_manifest
       @result = nil
       loop do
         menu

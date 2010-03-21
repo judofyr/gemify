@@ -5,7 +5,7 @@ require 'gemify'
 require 'trollop'
 
 gemspec = nil
-actions = [:new, :update, :manifest, :generate_manifest]
+actions = [:new, :update, :manifest]
 
 opts = Trollop.options do
   version "gemify 0.3"
@@ -18,13 +18,12 @@ A simple gemspec editor
   opt :new, "Create a new gemspec"
   opt :update, "Update the manifest"
   opt :manifest, "Dump the manifest"
-  opt :generate_manifest, "Generate a manifest", :type => :string
 end
 
 action = opts.detect { |opt, val| actions.include?(opt) && val }
 action = action[0] unless action.nil?
 
-if action == :new || action == :generate_manifest
+if action == :new
   # do nothing
 elsif (arg = ARGV.shift).nil?
   gemspecs = Dir['*.gemspec']
@@ -39,7 +38,7 @@ elsif (arg = ARGV.shift).nil?
 elsif File.exists?(arg)
   gemspec = arg
 else
-   Trollop.die "No such file: #{arg}"
+  Trollop.die "No such file: #{arg}"
 end
 
 Trollop.die "Extra operand: #{ARGV[0]}" unless ARGV.empty?
@@ -48,12 +47,11 @@ cli = Gemify::CLI.load(gemspec)
 
 case action
 when :update
+  cli.update_manifest
   cli.save
   puts "Updated manifest (to #{cli.base.files.length} files)"
 when :manifest
   puts cli.base.inspect_files
-when :generate_manifest
-  puts Gemify::Manifest.files(opts[:generate_manifest])
 else
   cli.main
 end

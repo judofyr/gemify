@@ -14,16 +14,11 @@ module Gemify
   #   base.build! # Builds the gem
   class Base < Gem::Specification
     REQUIRED = [:name, :summary, :version]
-    OPTIONAL = [:author, :email, :homepage, :manifest, :dependencies]
+    OPTIONAL = [:author, :email, :homepage, :dependencies]
     ALL = REQUIRED + OPTIONAL
     
-    attr_accessor :manifest
-    
     def manifest=(type)
-      @manifest = type && begin
-        self.files = Gemify::Manifest.files(type)
-        type
-      end
+      # do nothing
     end
     
     def inspect_files
@@ -58,15 +53,6 @@ module Gemify
         end
       else
         send("#{setting}=", value) if respond_to?("#{setting}=")
-      end
-    end
-    
-    def to_ruby
-      super +
-      if @manifest
-        "\nGemify.last_specification.manifest = #{ruby_code manifest} if defined?(Gemify)\n"
-      else
-        ""
       end
     end
     
