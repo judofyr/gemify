@@ -34,7 +34,7 @@ module Gemify
       val = send(setting) if respond_to?(setting)
       if setting.to_s == "dependencies"
         val.empty? ? nil : val.map do |dep|
-          "#{dep.name} #{dep.version_requirements}"
+          "#{dep.name} #{dep.requirement}"
         end.join(" & ")
       else
         val
