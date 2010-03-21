@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.6}
   s.summary = %q{The lightweight gemspec editor}
+  s.post_install_message = %q{** Gemify has changed since 0.2, please see http://dojo.rubyforge.org/}
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
