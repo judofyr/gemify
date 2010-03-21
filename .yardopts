@@ -1,2 +1,4 @@
 --title Gemify
 --exclude trollop
+--no-highlight
+README.md
