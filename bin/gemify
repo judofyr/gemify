@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require 'gemify'
+require 'fileutils'
 include Gemify
+include FileUtils
 
 options, args = ARGV.partition { |a| a[0] == ?- }
 verify_only = options.include?('-v')
@@ -168,6 +170,8 @@ puts
 puts "Please open #{gemspec} in your text editor and fill out the details."
 
 unless version
+  mkdir_p(File.dirname(version_file))
+
   File.open(version_file, "w") do |f|
     i = 0
     mods = namespace.split("::")
