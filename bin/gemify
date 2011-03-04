@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'gemify'
+require 'gemify/version'
 require 'fileutils'
 include Gemify
 include FileUtils
@@ -7,6 +8,22 @@ include FileUtils
 options, args = ARGV.partition { |a| a[0] == ?- }
 verify_only = options.include?('-v')
 force = options.include?('-f')
+
+if options.grep(/^--?(h|\?)/).first
+  puts <<-EOF
+Gemify v#{Gemify::VERSION}
+
+Verify project and generate gemspec:
+  #$0
+
+Only verify project:
+  #$0 -v
+
+Show help:
+  #$0 -h
+EOF
+  exit
+end
 
 puts <<-EOF
 Gemify needs to know a bit about your project, but should be
