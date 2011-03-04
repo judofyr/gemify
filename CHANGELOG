@@ -1,3 +1,6 @@
+== 0.4
+* Gemify is now a gemspec generator!
+
 == 0.3
 * Gemify is now a gemspec editor!
 

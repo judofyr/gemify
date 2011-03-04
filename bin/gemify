@@ -1,57 +1,237 @@
 #!/usr/bin/env ruby
-
-$:.unshift File.dirname(__FILE__) + '/../lib'
 require 'gemify'
-require 'trollop'
+include Gemify
 
-gemspec = nil
-actions = [:new, :update, :manifest]
+options, args = ARGV.partition { |a| a[0] == ?- }
+verify_only = options.include?('-v')
+force = options.include?('-f')
 
-opts = Trollop.options do
-  version "gemify 0.3"
-  banner <<-EOS
-Usage: #{$0} [OPTION]... [FILE]
-A simple gemspec editor
-  
-  EOS
-  
-  opt :new, "Create a new gemspec"
-  opt :update, "Update the manifest"
-  opt :manifest, "Dump the manifest"
+puts <<-EOF
+Gemify needs to know a bit about your project, but should be
+able to guess most of the information. Type the value if you
+need to correct it, or press ENTER to accept the suggestion by Gemify.
+
+EOF
+
+name = clean_name(args.shift || File.basename(Dir.pwd))
+name = ask "Project name", name
+
+namespace = name_to_namespace(name)
+namespace = ask "Namespace", namespace
+
+library = namespace_to_library(namespace)
+library = ask "Library", 'lib/' + library
+library = 'lib/' + library unless library =~ /^lib\//
+puts
+
+gemspec = "#{name}.gemspec"
+
+if !force && !verify_only && File.exists?(gemspec)
+  puts <<-EOF
+*** Gemspec already exists!
+Either remove the gemspec:
+  mv #{gemspec} #{gemspec}.old
+
+Or run the verifier only:
+  #{$0} -v #{ARGV.join(' ')}
+
+Or force an overwrite:
+  #{$0} -f #{ARGV.join(' ')}
+EOF
+  exit
 end
 
-action = opts.detect { |opt, val| actions.include?(opt) && val }
-action = action[0] unless action.nil?
 
-if action == :new
-  # do nothing
-elsif (arg = ARGV.shift).nil?
-  gemspecs = Dir['*.gemspec']
-  gemspec = case gemspecs.length
-  when 0
-    nil
-  when 1
-    gemspecs.first
-  else
-    gemspecs
+## Verify files
+
+puts "*** Verifying the structure of lib/"
+
+Dir["lib/**/*"].each do |file|
+  next if File.directory?(file)
+  next if file =~ /^lib\/tasks/
+  
+  if File.extname(file) != ".rb"
+    w :lib_rb, "Non-Ruby library: #{file}"
   end
-elsif File.exists?(arg)
-  gemspec = arg
-else
-  Trollop.die "No such file: #{arg}"
+  
+  if file !~ /^#{Regexp.escape(library)}(\.rb|\/)/
+    w :lib_leaky, "Library pollution: #{file}"
+  end
+  
+  mode = File.stat(file).mode.to_s(8)[-4..-1]
+  if mode != "0644"
+    w :bin_mode, "Wrong permission (#{mode}): #{file}"
+  end
 end
 
-Trollop.die "Extra operand: #{ARGV[0]}" unless ARGV.empty?
-  
-cli = Gemify::CLI.load(gemspec)
+if w? :lib_rb
+  n "Please consider moving any library non-Ruby files to the data/ directory"
+end
 
-case action
-when :update
-  cli.update_manifest
-  cli.save
-  puts "Updated manifest (to #{cli.base.files.length} files)"
-when :manifest
-  puts cli.base.inspect_files
-else
-  cli.main
+if w? :lib_leaky
+  n "Please consider moving all your library files to the #{library}/ directory"
+end
+
+if w? :lib_perm
+  n "Please consider to chmod all your library files to 0644"
+  if yes "  Should Gemify do this for you?"
+    Dir["lib/**/*"].each do |file|
+      next if File.directory?(file)
+      File.chmod(0644, file)
+    end
+  end
+end
+
+version_require = library[4..-1] + '/version'
+version_file = library + '/version.rb'
+version = File.exists?(version_file)
+
+unless version
+  n "Please consider to define #{namespace}::VERSION in #{version_file}"
+end
+
+puts "[.] Done"
+
+puts
+puts "*** Verifying the structure of bin/"
+
+shebang = "#!/usr/bin/env ruby"
+
+Dir["bin/*"].each do |file|
+  next if File.directory?(file)
+  
+  File.open(file) do |f|
+    if f.read(shebang.length) != shebang
+      w :shebang, "Missing shebang: #{file}"
+    end
+  end
+  
+  if File.extname(file) == ".rb"
+    w :bin_rb, ".rb extension: #{file}"
+  end
+  
+  mode = File.stat(file).mode.to_s(8)[-4..-1]
+  if mode != "0755"
+    w :bin_mode, "Wrong permission (#{mode}): #{file}"
+  end
+end
+
+if w? :shebang 
+  n "Please consider to add '#{shebang}' to all binaries"
+end
+
+if w? :bin_rb
+  n "Please consider that binaries should NOT end in .rb"
+end
+
+if w? :bin_mode
+  n "Please consider to chmod all your binary files to 0755"
+  if yes "  Should Gemify do this for you?"
+    Dir["bin/*"].each do |file|
+      next if File.directory?(file)
+      File.chmod(0755, file)
+    end
+  end
+end
+
+puts "[.] Done"
+
+puts
+puts "*** Verifying the structure of ext/"
+
+Dir["ext/*"].each do |ext|
+  unless File.exists?(ext + '/extconf.rb')
+    w :ext_conf, "Missing extconf.rb: #{ext}"
+  end
+end
+
+if w? :ext_conf
+  n "All extensions MUST have a extconf.rb"
+end
+
+exit if options.include?('-v')
+
+puts
+puts "*** Generating a gemspec"
+
+require 'erb'
+require 'time'
+
+now = Time.now.strftime('%Y-%m-%d')
+content = ERB.new(DATA.read).result(binding)
+File.open(gemspec, "w") do |f|
+  f << content
+end
+
+puts "[.] Done"
+puts
+puts "Please open #{gemspec} in your text editor and fill out the details."
+
+unless version
+  File.open(version_file, "w") do |f|
+    i = 0
+    mods = namespace.split("::")
+    mods.each do |mod|
+      f.puts("#{'  '*i}module #{mod}")
+      i += 1
+    end
+    
+    f.puts("#{'  '*i}VERSION = '0.0.1'")
+    
+    mods.each do
+      i -= 1
+      f.puts("#{'  '*i}end")
+    end
+  end
+  
+  puts
+  puts <<-EOF
+You must also define #{namespace}::VERSION in #{version_file}.
+Gemify has automatically created the file for you, so simply
+open it in your text editor and fill in the current version.
+EOF
+end
+
+__END__
+# -*- encoding: utf-8 -*-
+$:.push('lib')
+require <%= version_require.inspect %>
+
+Gem::Specification.new do |s|
+  s.name     = <%= name.inspect %>
+  s.version  = <%= namespace %>::VERSION.dup
+  s.date     = <%= now.inspect %>
+  s.summary  = "TODO: Summary of project"
+  s.email    = "todo@project.com"
+  s.homepage = "http://todo.project.com/"
+  s.authors  = ['Me Todo']
+  
+  s.description = <<-EOF
+TODO: Long description 
+EOF
+  
+  dependencies = [
+    # Examples:
+    # [:runtime,     "rack",  "~> 1.1"],
+    # [:development, "rspec", "~> 2.1"],
+  ]
+  
+  s.files         = Dir['**/*']
+  s.test_files    = Dir['test/**/*'] + Dir['spec/**/*']
+  s.executables   = Dir['bin/*'].map { |f| File.basename(f) }
+  s.require_paths = ["lib"]
+  
+  
+  ## Make sure you can build the gem on older versions of RubyGems too:
+  s.rubygems_version = <%= Gem::VERSION.inspect %>
+  s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
+  s.specification_version = 3 if s.respond_to? :specification_version
+  
+  dependencies.each do |type, name, version|
+    if s.respond_to?("add_#{type}_dependency")
+      s.send("add_#{type}_dependency", name, version)
+    else
+      s.add_dependency(name, version)
+    end
+  end
 end
