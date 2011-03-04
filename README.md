@@ -1,71 +1,51 @@
-Gemify, the lightweight gemspec editor
-======================================
+Gemify, the gemspec generator
+=============================
 
 Overview
 --------
 
-Gemify is a simple tool which helps you create and manage your gemspecs.
-Instead of messing with Rakefiles and adding yet another development
-dependency (like Hoe, Echoe and Jeweler), Gemify takes a much less obtrusive
-approach.
-
-Gemify works directly on the .gemspec file. In fact, when you're using Gemify,
-you're only using it as an editor. If you want, you could just edit the file
-manually.
+Gemify is a simple tool which helps you generate gemspecs (which are
+used for building gems) and verify that your project follows the common
+and proven way to structure your Ruby packages.
 
 Getting started
 ---------------
 
+Generating gemspec:
+
     $ gem install gemify
-    $ cd myproject (might already have a gemspec)
+    $ cd myproject (which doesn't have a gemspec yet)
     $ gemify
-    Currently editing gemify.gemspec
+    Gemify needs to know a bit about your project, but should be
+    able to guess most of the information. Type the value if you
+    need to correct it, or press ENTER to accept the suggestion by Gemify.
 
-    Which task would you like to invoke?
-    1) Change name (required) = gemify
-    2) Change summary (required) = The lightweight gemspec editor
-    3) Change version (required) = 0.3
-    4) Change author = Magnus Holm
-    5) Change email = judofyr@gmail.com
-    6) Change homepage = http://dojo.rubyforge.org/
-    7) Set dependencies
+    Project name:        gemify? 
+    Namespace:           Gemify? 
+    Library:             lib/gemify? 
 
-    s) Save
-    r) Reload (discard unsaved changes)
-    m) Rename
-    l) List files
+    *** Verifying the structure of lib/
+    [+] Please consider to define Gemify::VERSION in lib/gemify/version.rb
+    [.] Done
 
-    x) Exit
+    *** Verifying the structure of bin/
+    [.] Done
 
-    > 
+    *** Verifying the structure of ext/
+    [.] Done
 
-### Manifest
+    *** Generating a gemspec
+    [.] Done
 
-Gemify helps you manage the manifest (files which will be included in the gem). It follows these rules:
+    Please open gemify.gemspec in your text editor and fill out the details.
 
-* If there's a file called **MANIFEST**, **Manifest.txt** or **.manifest**, it
-  assumes this files contains a line-separated list of the manifest.
+    You must also define Gemify::VERSION in lib/gemify/version.rb.
+    Gemify has automatically created the file for you, so simply
+    open it in your text editor and fill in the current version.
+    
+Or if you just want to verify it:
 
-* If not, it checks if you're using Git, Mercurial, Darcs, Bazaar, Subversion
-  or CVS and uses the commited files.
-
-* If not, it just includes all the files.
-
-You can always run `gemify -m` to see the manifest, and if you don't like what
-you see you should maintain a manifest file yourself. Every time you open
-Gemify and save, it will update the manifest. You can also call `gemify -u`.
-
-### Dependencies
-
-When you set dependencies, you can separate the version requirement by a
-comma:
-
-    $ gemify
-    ...
-    > 7
-    Split by ENTER and press ENTER twice when you're done
-    > nokogiri
-    > rack, >= 1.0  
+    $ gemify -v
 
 ### Build and share a gem
 
@@ -78,8 +58,8 @@ Let's not reinvent the wheel, shall we?
 Acknowledgements
 ----------------
 
-Thanks to [Pat Nakajima](http://patnakajima.com/) for reminding me that Gemify
-still has its uses.
+Thanks to [Pat Nakajima](http://patnakajima.com/) for reminding me that
+Gemify still has its uses.
 
 
 Contributors
