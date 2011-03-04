@@ -79,7 +79,7 @@ if w? :lib_perm
   if yes "  Should Gemify do this for you?"
     Dir["lib/**/*"].each do |file|
       next if File.directory?(file)
-      File.chmod(0644, file)
+      chmod(0644, file)
     end
   end
 end
@@ -131,7 +131,7 @@ if w? :bin_mode
   if yes "  Should Gemify do this for you?"
     Dir["bin/*"].each do |file|
       next if File.directory?(file)
-      File.chmod(0755, file)
+      chmod(0755, file)
     end
   end
 end
