@@ -6,13 +6,15 @@ Gem::Specification.new do |s|
   s.name     = "gemify"
   s.version  = Gemify::VERSION.dup
   s.date     = "2011-03-04"
-  s.summary  = "TODO: Summary of project"
-  s.email    = "todo@project.com"
-  s.homepage = "http://todo.project.com/"
-  s.authors  = ['Me Todo']
+  s.summary  = "Quickly generate gemspecs for your projects"
+  s.email    = "judofyr@gmail.com"
+  s.homepage = "http://dojo.rubyforge.org/gemify"
+  s.authors  = ['Magnus Holm']
   
-  s.description = <<-EOF
-TODO: Long description 
+  s.description = <<EOF
+Gemify is a simple tool which helps you generate gemspecs (which are
+used for building gems) and verify that your project follows the common
+and proven way to structure your Ruby packages.
 EOF
   
   dependencies = [
