@@ -151,6 +151,8 @@ if w? :ext_conf
   n "All extensions MUST have a extconf.rb"
 end
 
+puts "[.] Done"
+
 exit if options.include?('-v')
 
 puts
