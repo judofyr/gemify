@@ -39,6 +39,9 @@ Generating gemspec:
 
     Please open gemify.gemspec in your text editor and fill out the details.
 
+    You should fix any warnings that was reported above. You won't need to
+    generate a new gemspec after you've fixed them.
+
     You must also define Gemify::VERSION in lib/gemify/version.rb.
     Gemify has automatically created the file for you, so simply
     open it in your text editor and fill in the current version.

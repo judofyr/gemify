@@ -186,7 +186,12 @@ end
 
 puts "[.] Done"
 puts
-puts "Please open #{gemspec} in your text editor and fill out the details."
+puts <<EOF
+Please open #{gemspec} in your text editor and fill out the details.
+
+You should fix any warnings that was reported above. You won't need to
+generate a new gemspec after you've fixed them.
+EOF
 
 unless version
   mkdir_p(File.dirname(version_file))
