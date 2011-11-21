@@ -179,7 +179,7 @@ require 'erb'
 require 'time'
 
 now = Time.now.strftime('%Y-%m-%d')
-content = ERB.new(DATA.read).result(binding)
+content = ERB.new(File.read(__FILE__).split('__END__').last).result(binding)
 File.open(gemspec, "w") do |f|
   f << content
 end
