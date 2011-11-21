@@ -72,3 +72,5 @@ Contributors
 * Ben Wyrosdick
 * Chris Wanstrath
 * Pat Nakajima
+* Vincent Landgraf
+
